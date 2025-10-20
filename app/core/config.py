@@ -47,6 +47,17 @@ class AppSettings(BaseSettings):
         env="ALLOWED_FILE_EXTENSIONS"
     )
 
+    # Kafka settings (optional)
+    kafka_enabled: bool = Field(default=False, env="KAFKA_ENABLED")
+    kafka_bootstrap_servers: str | None = Field(default=None, env="KAFKA_BOOTSTRAP_SERVERS")
+    kafka_group_id: str = Field(default="harmonizacao-clientes-consumer", env="KAFKA_GROUP_ID")
+    kafka_clientes_topic: str = Field(default="clientes", env="KAFKA_CLIENTES_TOPIC")
+    kafka_auto_offset_reset: str = Field(default="latest", env="KAFKA_AUTO_OFFSET_RESET")
+    kafka_ssl: bool = Field(default=False, env="KAFKA_SSL")
+    kafka_ssl_cafile: str | None = Field(default=None, env="KAFKA_SSL_CAFILE")
+    kafka_ssl_certfile: str | None = Field(default=None, env="KAFKA_SSL_CERTFILE")
+    kafka_ssl_keyfile: str | None = Field(default=None, env="KAFKA_SSL_KEYFILE")
+
     @field_validator("cors_allow_origins", mode="before")
     def parse_cors_allow_origins(cls, v: Union[str, List[str], None]) -> List[str]:
         if v is None:

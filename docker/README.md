@@ -94,8 +94,8 @@ docker-compose up --build -d
 ```
 ┌─────────────────┐     ┌─────────────────┐
 │                 │     │                 │
-│  FastAPI App    │────▶│    MongoDB      │
-│  (Port 8000)    │     │  (Port 27017)   │
+│  FastAPI App    │───▶│    MongoDB      │
+│  (Port 8003)    │     │  (Port 27017)   │
 │                 │     │                 │
 └─────────────────┘     └─────────────────┘
 ```
@@ -118,9 +118,9 @@ docker-compose up --build -d
 
 Após inicializar, os seguintes endpoints estarão disponíveis:
 
-- **API**: http://localhost:8000
-- **Documentação**: http://localhost:8000/docs
-- **Redoc**: http://localhost:8000/redoc
+- **API**: http://localhost:8003
+- **Documentação**: http://localhost:8003/docs
+- **Redoc**: http://localhost:8003/redoc
 
 ### Principais Rotas
 - `POST /v1/cliente/formulario` - Criar cliente
@@ -230,16 +230,16 @@ docker-compose exec mongodb mongosh -u admin -p admin123 --authenticationDatabas
 ### 🌐 Teste de API
 ```powershell
 # Health check da API
-curl http://localhost:8000/v1/healthz
+curl http://localhost:3/v1/healthz
 
 # Health check do cliente service
-curl http://localhost:8000/v1/cliente/healthz
+curl http://localhost:8003/v1/cliente/healthz
 
 # Teste do endpoint de documentação
-start http://localhost:8000/docs
+start http://localhost:8003/docs
 
 # Teste simples de cliente (POST)
-curl -X POST "http://localhost:8000/v1/cliente/formulario" -H "Content-Type: application/json" -d '{
+curl -X POST "http://localhost:8003/v1/cliente/formulario" -H "Content-Type: application/json" -d '{
   "nome": "Teste Cliente",
   "telefone": ["11999999999"],
   "email": ["teste@email.com"],
@@ -280,7 +280,7 @@ docker-compose logs harmonizacao_app
 docker-compose logs mongodb
 
 # Se porta estiver ocupada
-netstat -ano | findstr :8000
+netstat -ano | findstr :8003
 netstat -ano | findstr :27017
 
 # Resetar ambiente completo
@@ -298,7 +298,7 @@ docker-compose exec mongodb mongosh --eval "db.adminCommand('ping')"
 
 ### API
 ```bash
-curl http://localhost:8000/v1/healthz
+curl http://localhost:8003/v1/healthz
 ```
 
 ## 🔍 Monitoramento
@@ -338,7 +338,7 @@ CORS_ALLOW_ORIGINS=["*"]
 ```
 
 ### Portas
-- **API**: 8000 (configurável no docker-compose.yml)
+- **API**: 8003 (configurável no docker-compose.yml)
 - **MongoDB**: 27017 (configurável no docker-compose.yml)
 
 ## 🗃️ Persistência de Dados
@@ -420,7 +420,7 @@ docker-compose up --build -d
 docker-compose ps
 
 # 4. Testar API
-curl http://localhost:8000/v1/healthz
+curl http://localhost:8003/v1/healthz
 ```
 
 #### **Erro: "caracteres especiais" ou "string não tem terminador"**
@@ -479,7 +479,7 @@ docker-compose exec harmonizacao_app env | grep MONGODB
 ### Porta já em uso
 ```bash
 # Verificar processos usando a porta
-netstat -ano | findstr :8000
+netstat -ano | findstr :8003
 netstat -ano | findstr :27017
 
 # Alterar portas no docker-compose.yml se necessário
@@ -523,7 +523,7 @@ docker-compose up --build -d   # Manual
 ```powershell
 docker-compose ps             # Status dos containers
 docker-compose logs -f        # Ver logs em tempo real
-curl http://localhost:8000/v1/healthz  # Testar API
+curl http://localhost:8003/v1/healthz  # Testar API
 ```
 
 ### 🛑 **Parar Ambiente**
@@ -541,8 +541,8 @@ docker-compose exec mongodb bash     # Entrar no container
 ```
 
 ### 🌐 **Acessos Rápidos**
-- **API**: http://localhost:8000
-- **Documentação**: http://localhost:8000/docs  
+- **API**: http://localhost:8003
+- **Documentação**: http://localhost:8003/docs  
 - **MongoDB**: localhost:27017 (admin/admin123)
 - **Dados**: C:\projects\db\harmonizacao\
 
@@ -554,7 +554,7 @@ docker system prune -f
 docker-compose up --build -d
 
 # Verificar portas ocupadas
-netstat -ano | findstr :8000
+netstat -ano | findstr :8003
 netstat -ano | findstr :27017
 ```
 

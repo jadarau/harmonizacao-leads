@@ -66,7 +66,7 @@ fi
 echo "🔍 Verificando saúde da aplicação..."
 timeout=30
 while [ $timeout -gt 0 ]; do
-    if curl -s http://localhost:8000/v1/healthz > /dev/null 2>&1; then
+    if curl -s http://localhost:8003/v1/healthz > /dev/null 2>&1; then
         echo "✅ Aplicação está rodando!"
         break
     fi
@@ -79,8 +79,8 @@ echo ""
 echo "🎉 Ambiente Docker iniciado com sucesso!"
 echo ""
 echo "📊 Serviços disponíveis:"
-echo "  🌐 API: http://localhost:8000"
-echo "  📚 Documentação: http://localhost:8000/docs"
+echo "  🌐 API: http://localhost:8003"
+echo "  📚 Documentação: http://localhost:8003/docs"
 echo "  🗄️  MongoDB: localhost:27017"
 echo ""
 echo "🔧 Comandos úteis:"

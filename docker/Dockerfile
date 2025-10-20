@@ -29,11 +29,11 @@ RUN useradd --create-home --shell /bin/bash app \
 USER app
 
 # Expõe a porta da aplicação
-EXPOSE 8000
+EXPOSE 8003
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/v1/healthz || exit 1
+    CMD curl -f http://localhost:8003/v1/healthz || exit 1
 
 # Comando para iniciar a aplicação
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]

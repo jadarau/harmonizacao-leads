@@ -23,14 +23,14 @@ services:
       retries: 5
       start_period: 40s
 
-  harmonizacao_app:
+  harmonizacao_leads_app:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: harmonizacao_api
+    container_name: harmonizacao_leads_api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8003:8003"
     environment:
       - MONGODB_URL=mongodb://admin:admin123@mongodb:27017/harmonizacao?authSource=admin
       - MONGODB_DATABASE=harmonizacao

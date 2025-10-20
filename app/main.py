@@ -8,13 +8,17 @@ from app.api.routes.file import router as file_router
 from app.api.routes.cliente import router as cliente_router
 from app.database import connect_to_mongo, close_mongo_connection
 from app.api.routes.rag import router as rag_router
+from app.services.kafka_consumer import start_kafka_consumer_if_enabled, stop_kafka_consumer
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     await connect_to_mongo()
+    # Kafka consumer (opcional)
+    await start_kafka_consumer_if_enabled()
     yield
     # Shutdown  
+    await stop_kafka_consumer()
     await close_mongo_connection()
 
 app = FastAPI(

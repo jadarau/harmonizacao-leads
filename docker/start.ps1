@@ -67,7 +67,7 @@ Write-Host "Verificando saude da aplicacao..." -ForegroundColor Cyan
 $timeout = 30
 while ($timeout -gt 0) {
     try {
-        Invoke-WebRequest -Uri "http://localhost:8000/v1/healthz" -TimeoutSec 2 | Out-Null
+        Invoke-WebRequest -Uri "http://localhost:8003/v1/healthz" -TimeoutSec 2 | Out-Null
         Write-Host "Aplicacao esta rodando!" -ForegroundColor Green
         break
     } catch {
@@ -81,8 +81,8 @@ Write-Host ""
 Write-Host "Ambiente Docker iniciado com sucesso!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Servicos disponiveis:" -ForegroundColor Cyan
-Write-Host "  API: http://localhost:8000" -ForegroundColor White
-Write-Host "  Documentacao: http://localhost:8000/docs" -ForegroundColor White
+Write-Host "  API: http://localhost:8003" -ForegroundColor White
+Write-Host "  Documentacao: http://localhost:8003/docs" -ForegroundColor White
 Write-Host "  MongoDB: localhost:27017" -ForegroundColor White
 Write-Host ""
 Write-Host "Comandos uteis:" -ForegroundColor Cyan
