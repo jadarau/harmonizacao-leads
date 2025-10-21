@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Union
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
+import os
 
 class AppSettings(BaseSettings):
     # Groq API settings
@@ -49,7 +50,7 @@ class AppSettings(BaseSettings):
 
     # Kafka settings (optional)
     kafka_enabled: bool = Field(default=False, env="KAFKA_ENABLED")
-    kafka_bootstrap_servers: str | None = Field(default=None, env="KAFKA_BOOTSTRAP_SERVERS")
+    kafka_bootstrap_servers: str = Field(default="localhost:9092", env="KAFKA_BOOTSTRAP_SERVERS")
     kafka_group_id: str = Field(default="harmonizacao-clientes-consumer", env="KAFKA_GROUP_ID")
     kafka_clientes_topic: str = Field(default="clientes", env="KAFKA_CLIENTES_TOPIC")
     kafka_auto_offset_reset: str = Field(default="latest", env="KAFKA_AUTO_OFFSET_RESET")
@@ -90,5 +91,15 @@ class AppSettings(BaseSettings):
         "case_sensitive": False,
         "extra": "ignore",  # Para evitar erro com variáveis extras no .env
     }
+
+    @field_validator("kafka_clientes_topic", mode="before")
+    def compat_kafka_topic_env(cls, v: str | None) -> str:
+        # Compatibilidade com API de cadastro: KAFKA_TOPIC_CLIENTE
+        if v and str(v).strip():
+            return v
+        alt = os.environ.get("KAFKA_TOPIC_CLIENTE")
+        if alt and alt.strip():
+            return alt
+        return v or "clientes"
 
 settings = AppSettings()

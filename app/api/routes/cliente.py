@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from app.models import Cliente
 from app.database.deps import get_cliente_repository
 from app.database.repository import ClienteRepository
+from app.services.kafka_consumer import _consumer_instance
 
 router = APIRouter(prefix="/v1/cliente", tags=["cliente"])
 
@@ -58,6 +59,22 @@ async def receber_formulario(
 async def health():
     """Endpoint de health check para rotas de cliente"""
     return {"status": "ok", "service": "cliente", "time": datetime.utcnow().isoformat()}
+
+@router.get("/kafka-status")
+async def kafka_status():
+    """Status simples do consumer Kafka para diagnóstico."""
+    try:
+        running = bool(_consumer_instance and _consumer_instance.is_running())
+    except Exception:
+        running = False
+    from app.core.config import settings
+    return {
+        "enabled": getattr(settings, "kafka_enabled", False),
+        "bootstrap": getattr(settings, "kafka_bootstrap_servers", "localhost:9092"),
+        "topic": getattr(settings, "kafka_clientes_topic", "clientes"),
+        "group_id": getattr(settings, "kafka_group_id", "harmonizacao-clientes-consumer"),
+        "running": running,
+    }
 
 @router.get("/{cliente_id}")
 async def get_cliente(

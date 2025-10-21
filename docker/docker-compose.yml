@@ -36,6 +36,10 @@ services:
       - MONGODB_DATABASE=harmonizacao
       - MONGODB_COLLECTION_CLIENTES=clientes
       - GROQ_API_KEY=${GROQ_API_KEY}
+      # Kafka (habilite conforme necessário)
+      - KAFKA_ENABLED=true
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC_CLIENTE=clientes
     depends_on:
       mongodb:
         condition: service_healthy
@@ -43,6 +47,27 @@ services:
       - harmonizacao_network
     volumes:
       - ../app:/app/app:ro
+
+  # kafka:
+  #   image: bitnami/kafka:3.7
+  #   container_name: harmonizacao_kafka
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"   # Externo (Host -> API de leads)
+  #     - "29092:29092" # Interno (Docker -> API de cadastro)
+  #   environment:
+  #     - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_ENABLE_KRAFT=no
+  #     # Dual listeners: INTERN (kafka:29092) e EXTERN (localhost:9092)
+  #     - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+  #     - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+  #     - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #     - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+  #     - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+  #   networks:
+  #     - harmonizacao_network
 
 networks:
   harmonizacao_network:

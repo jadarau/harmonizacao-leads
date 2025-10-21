@@ -63,6 +63,7 @@ class ClientesKafkaConsumer:
         self._ssl_cafile = ssl_cafile
         self._ssl_certfile = ssl_certfile
         self._ssl_keyfile = ssl_keyfile
+        self._started = False
 
     async def start(self) -> None:
         logger.info("Iniciando Kafka consumer para tópico '%s'", self._topic)
@@ -92,7 +93,16 @@ class ClientesKafkaConsumer:
             ssl_context=self._ssl_context,
             value_deserializer=lambda v: v.decode("utf-8") if v is not None else None,
         )
+        logger.info(
+            "Kafka consumer config: servers=%s group_id=%s topic=%s offset_reset=%s ssl=%s",
+            self._bootstrap_servers,
+            self._group_id,
+            self._topic,
+            self._auto_offset_reset,
+            bool(self._ssl_context),
+        )
         await self._consumer.start()
+        self._started = True
         self._task = asyncio.create_task(self._run())
 
     async def stop(self) -> None:
@@ -102,6 +112,7 @@ class ClientesKafkaConsumer:
             await self._task
         if self._consumer:
             await self._consumer.stop()
+        self._started = False
         logger.info("Kafka consumer parado")
 
     async def _run(self) -> None:
@@ -122,6 +133,17 @@ class ClientesKafkaConsumer:
             for _tp, records in batches.items():
                 for record in records:
                     raw_value = record.value
+                    try:
+                        logger.info(
+                            "Kafka mensagem recebida: topic=%s partition=%s offset=%s key=%s",
+                            record.topic,
+                            record.partition,
+                            record.offset,
+                            record.key.decode("utf-8") if isinstance(record.key, (bytes, bytearray)) else record.key,
+                        )
+                    except Exception:
+                        # Não interrompe o fluxo por erro de log
+                        pass
                     if raw_value is None:
                         logger.warning("Mensagem vazia recebida em '%s'", self._topic)
                         continue
@@ -131,6 +153,13 @@ class ClientesKafkaConsumer:
                     except json.JSONDecodeError:
                         logger.exception("Falha ao decodificar JSON da mensagem: %s", raw_value)
                         continue
+
+                    # Desembrulhar payload caso venha aninhado
+                    if isinstance(payload, dict):
+                        for wrapper_key in ("cliente", "data", "payload"):
+                            if wrapper_key in payload and isinstance(payload[wrapper_key], dict):
+                                payload = payload[wrapper_key]
+                                break
 
                     mapped = self._map_payload_to_cliente(payload)
 
@@ -202,6 +231,9 @@ class ClientesKafkaConsumer:
         }
         return mapped
 
+    def is_running(self) -> bool:
+        return self._started and not self._stopping.is_set()
+
 
 _consumer_instance: Optional[ClientesKafkaConsumer] = None
 
@@ -240,7 +272,16 @@ async def start_kafka_consumer_if_enabled() -> None:
         ssl_keyfile=ssl_keyfile,
         auto_offset_reset=auto_offset_reset,
     )
-    await _consumer_instance.start()
+    try:
+        await _consumer_instance.start()
+    except Exception as e:
+        logger.error(
+            "Falha ao iniciar Kafka consumer (bootstrap=%s topic=%s). A API seguirá sem consumer. Erro: %s",
+            bootstrap,
+            topic,
+            e,
+        )
+        _consumer_instance = None
 
 
 async def stop_kafka_consumer() -> None:
