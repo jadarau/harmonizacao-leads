@@ -40,6 +40,12 @@ class AppSettings(BaseSettings):
     default_max_results: int = Field(default=5, env="DEFAULT_MAX_RESULTS")
     default_min_score: float = Field(default=0.3, env="DEFAULT_MIN_SCORE")
     
+    # System behavior settings
+    system_role_description: str = Field(
+        default="VOCÊ É UM ESPECIALISTA EM SEGURANÇA COM VEÍCULOS ELÉTRICOS E ELETRIFICADOS, E PRECISA SER APTO PARA RESPONDER QUALQUER PERGUNTA SOBRE ESSE TEMA.",
+        env="SYSTEM_ROLE_DESCRIPTION"
+    )
+    
     # File upload settings
     max_file_size_mb: int = Field(default=50, env="MAX_FILE_SIZE_MB")
     allowed_file_extensions: List[str] = Field(
