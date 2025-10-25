@@ -6,6 +6,7 @@ from app.llm.client import LlmClient
 from app.llm.groq import GroqLlmClient
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.schemas.rag import RAGChatRequest, RAGChatResponse
+from app.core.config import settings
 
 
 class RAGLlmClient:
@@ -84,7 +85,7 @@ class RAGLlmClient:
                 for i, result in enumerate(sources)
             ])
             
-            enhanced_prompt = f"""Você é um assistente especializado que responde perguntas baseado em documentos fornecidos.
+            enhanced_prompt = f"""{settings.system_role_description}
 
 CONTEXTO DOS DOCUMENTOS:
 {context_text}
@@ -92,16 +93,25 @@ CONTEXTO DOS DOCUMENTOS:
 PERGUNTA DO USUÁRIO: {req.query}
 
 INSTRUÇÕES:
-1. Responda à pergunta usando APENAS as informações dos documentos fornecidos
-2. Se a resposta não estiver nos documentos, diga que não tem informação suficiente
+1. Responda à pergunta usando as informações dos documentos fornecidos e seu conhecimento especializado em segurança com veículos elétricos e eletrificados
+2. Se a resposta não estiver completamente nos documentos, use seu conhecimento especializado para complementar a resposta
 3. Cite as fontes quando apropriado (ex: "Segundo a Fonte 1...")
-4. Seja preciso e objetivo
+4. Seja preciso, técnico e objetivo
+5. Priorize aspectos de segurança em todas as respostas
 
 RESPOSTA:"""
         else:
-            enhanced_prompt = f"""Não foi possível encontrar informações relevantes nos documentos para responder à pergunta: {req.query}
+            enhanced_prompt = f"""{settings.system_role_description}
 
-Por favor, reformule sua pergunta ou faça upload de documentos relacionados ao tópico desejado."""
+PERGUNTA DO USUÁRIO: {req.query}
+
+INSTRUÇÕES:
+1. Responda à pergunta usando seu conhecimento especializado em segurança com veículos elétricos e eletrificados
+2. Seja preciso, técnico e objetivo
+3. Priorize aspectos de segurança em todas as respostas
+4. Se necessário, mencione que informações adicionais podem ser obtidas através de documentos técnicos específicos
+
+RESPOSTA:"""
         
         # Make LLM request
         chat_req = ChatRequest(
@@ -163,7 +173,7 @@ Por favor, reformule sua pergunta ou faça upload de documentos relacionados ao 
                 for i, result in enumerate(sources)
             ])
             
-            enhanced_prompt = f"""Você é um assistente especializado que responde perguntas baseado em documentos fornecidos.
+            enhanced_prompt = f"""{settings.system_role_description}
 
 CONTEXTO DOS DOCUMENTOS:
 {context_text}
@@ -171,16 +181,25 @@ CONTEXTO DOS DOCUMENTOS:
 PERGUNTA DO USUÁRIO: {req.query}
 
 INSTRUÇÕES:
-1. Responda à pergunta usando APENAS as informações dos documentos fornecidos
-2. Se a resposta não estiver nos documentos, diga que não tem informação suficiente
+1. Responda à pergunta usando as informações dos documentos fornecidos e seu conhecimento especializado em segurança com veículos elétricos e eletrificados
+2. Se a resposta não estiver completamente nos documentos, use seu conhecimento especializado para complementar a resposta
 3. Cite as fontes quando apropriado (ex: "Segundo a Fonte 1...")
-4. Seja preciso e objetivo
+4. Seja preciso, técnico e objetivo
+5. Priorize aspectos de segurança em todas as respostas
 
 RESPOSTA:"""
         else:
-            enhanced_prompt = f"""Não foi possível encontrar informações relevantes nos documentos para responder à pergunta: {req.query}
+            enhanced_prompt = f"""{settings.system_role_description}
 
-Por favor, reformule sua pergunta ou faça upload de documentos relacionados ao tópico desejado."""
+PERGUNTA DO USUÁRIO: {req.query}
+
+INSTRUÇÕES:
+1. Responda à pergunta usando seu conhecimento especializado em segurança com veículos elétricos e eletrificados
+2. Seja preciso, técnico e objetivo
+3. Priorize aspectos de segurança em todas as respostas
+4. Se necessário, mencione que informações adicionais podem ser obtidas através de documentos técnicos específicos
+
+RESPOSTA:"""
         
         # Stream LLM response
         chat_req = ChatRequest(
